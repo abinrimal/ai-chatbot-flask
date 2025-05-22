@@ -1,0 +1,8 @@
+User: Hello!
+AI: Hi there! How can I assist you today?
+User: Can you tell me the weather forecast?
+AI: Sure, where are you located?
+User: Sydney, Australia.
+AI: The forecast for Sydney today is sunny with a high of 25 degrees Celsius.
+User: Thanks!
+AI: You're welcome! Anything else I can help with?
