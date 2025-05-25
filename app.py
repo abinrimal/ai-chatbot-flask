@@ -50,23 +50,22 @@ def chat():
         save_history("")
         return jsonify({"response": "Goodbye! Chat history cleared."})
 
-    # Follow your generate.py style prompt
-    prompt = "The following is a conversation between a helpful AI assistant and a human.\n"
-    prompt += f"User: {user_input}\nAI:"
+    # Load or initialize chat history
+    history = load_history()
+    history += f"User: {user_input}\nAI:"
 
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(device)
+    # Tokenize with chat history
+    inputs = tokenizer(history, return_tensors="pt", truncation=True, max_length=1024).to(device)
     input_ids = inputs["input_ids"]
-    attention_mask = inputs["attention_mask"]
     input_length = input_ids.shape[1]
 
     output_ids = model.generate(
         input_ids=input_ids,
-        attention_mask=attention_mask,
-        max_length=input_length + 200,
+        max_length=input_length + 100,
         pad_token_id=tokenizer.eos_token_id,
         eos_token_id=tokenizer.eos_token_id,
         do_sample=True,
-        temperature=0.5,   # lower temperature for less randomness
+        temperature=0.7,
         top_k=50,
         top_p=0.9,
         repetition_penalty=1.2,
@@ -75,11 +74,12 @@ def chat():
     generated_tokens = output_ids[0][input_length:]
     response = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
 
-    # Save current prompt + response as new history (optional)
-    chat_history = f"{prompt} {response}\n"
-    save_history(chat_history)
+    # Update history
+    history += f" {response}\n"
+    save_history(history)
 
     return jsonify({"response": response})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
